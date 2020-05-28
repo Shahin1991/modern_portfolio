@@ -10,6 +10,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "homepage": "https://shahin1991.github.io/modern_portfolio",
   "dependencies": {
     "gh-pages": "^2.2.0",
     "node-sass": "^4.14.1"
