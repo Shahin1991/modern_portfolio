@@ -31,3 +31,11 @@ function toggleMenu() {
     showMenu = false;
   }
 }
+
+
+window.onload(){
+  if(document.querySelector('#main-footer'))
+  {
+    document.querySelector("#main-footer").innerHTML = `Copyright &copy; ${(new Date()).getFullYear()}`
+  }
+}
