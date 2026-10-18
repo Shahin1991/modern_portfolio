@@ -1,0 +1,83 @@
+@import "tailwindcss";
+@import "@fontsource/barlow/400.css";
+@import "@fontsource/barlow/500.css";
+@import "@fontsource/barlow/600.css";
+@import "@fontsource/barlow-condensed/500.css";
+@import "@fontsource/barlow-condensed/600.css";
+
+/* Night-apron blues with taxiway yellow: the palette of an airfield after dark. */
+@theme {
+  --color-night: #172031;
+  --color-apron: #1f2a3f;
+  --color-board: #0d1424;
+  --color-flap: #1b2438;
+  --color-line: #33415c;
+  --color-ink: #ece9e1;
+  --color-mist: #a3acbc;
+  --color-signal: #f2c230;
+
+  --font-sans: "Barlow", system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+}
+
+@layer base {
+  html {
+    background: var(--color-night);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  :target,
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
+
+  ::selection {
+    background: var(--color-signal);
+    color: var(--color-night);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+/* Split-flap departure board. Each character sits in its own flap with a hinge line through the middle. */
+@layer components {
+  .flap {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 0.78em;
+    height: 1.18em;
+    border-radius: 0.08em;
+    background: linear-gradient(var(--color-flap) 50%, #182033 50%);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .flap::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    height: 1px;
+    background: var(--color-board);
+  }
+
+  .flap[data-flipping] {
+    color: var(--color-mist);
+  }
+}

@@ -1,0 +1,238 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import FlapBoard from '../components/FlapBoard.astro';
+import Icon from '../components/Icon.astro';
+import portrait from '../assets/portrait.jpeg';
+import { profile, socials, experience, skills, projects } from '../data/site';
+
+// The CV button only appears once public/resume.pdf exists, so the site never links to a missing file.
+const hasResume = fs.existsSync(path.join(process.cwd(), 'public', 'resume.pdf'));
+const year = new Date().getFullYear();
+
+const section = 'mx-auto max-w-6xl px-4 py-20 sm:px-6 md:py-28';
+const heading = 'font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl';
+---
+
+<Layout>
+  <Header />
+
+  <main id="main">
+    <!-- Hero: the one loud moment on the page -->
+    <section id="top" class="border-b border-line/60">
+      <div class="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-16 pb-20 sm:px-6 md:grid-cols-[1fr_auto] md:pt-24 md:pb-28">
+        <div class="min-w-0">
+          <div class="inline-block max-w-full rounded-md bg-board p-3 shadow-[inset_0_0_0_1px_var(--color-line)] sm:p-4">
+            <FlapBoard as="h1" text={profile.name} class="text-[clamp(1.75rem,8.2vw,5.25rem)]" />
+            <FlapBoard text={profile.role} class="mt-3 text-[clamp(0.95rem,3.6vw,1.6rem)]" delay={500} />
+          </div>
+
+          <p class="mt-8 max-w-[34rem] text-lg leading-relaxed text-mist sm:text-xl">{profile.intro}</p>
+
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <a
+              href={`mailto:${profile.email}`}
+              class="inline-flex items-center gap-2 rounded bg-signal px-5 py-3 font-semibold text-night hover:bg-[#ffd451]"
+            >
+              <Icon name="mail" />
+              Email me
+            </a>
+            {hasResume && (
+              <a
+                href="/resume.pdf"
+                download="Shahin-Nazer-CV.pdf"
+                class="inline-flex items-center gap-2 rounded border border-line px-5 py-3 font-semibold text-ink hover:border-mist"
+              >
+                <Icon name="download" />
+                Download CV
+              </a>
+            )}
+            <ul class="ml-1 flex items-center gap-1" aria-label="Social profiles">
+              {socials.map(({ label, href, icon }) => (
+                <li>
+                  <a href={href} class="grid size-11 place-items-center rounded text-mist hover:text-signal" rel="me noopener">
+                    <Icon name={icon} />
+                    <span class="sr-only">{label}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <Image
+          src={portrait}
+          alt={`Portrait of ${profile.name}`}
+          width={250}
+          height={250}
+          loading="eager"
+          class="order-first size-28 rounded-full ring-4 ring-signal ring-offset-4 ring-offset-night sm:size-36 md:order-none md:size-52"
+        />
+      </div>
+    </section>
+
+    <section id="about" class={section} aria-labelledby="about-heading">
+      <div class="grid gap-10 md:grid-cols-[14rem_1fr]">
+        <h2 id="about-heading" class={heading}>About</h2>
+        <div class="max-w-[38rem] space-y-5 text-lg leading-relaxed text-mist">
+          {profile.bio.map((p) => <p>{p}</p>)}
+          <p class="text-ink">Based in {profile.location}.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="experience" class="border-y border-line/60 bg-apron/40" aria-labelledby="experience-heading">
+      <div class={section}>
+        <div class="grid gap-10 md:grid-cols-[14rem_1fr]">
+          <h2 id="experience-heading" class={heading}>Experience</h2>
+          <ol class="relative max-w-[42rem] border-l border-line">
+            {experience.map((job) => (
+              <li class="relative pb-12 pl-8 last:pb-0">
+                <span
+                  class:list={[
+                    'absolute top-2 -left-[7px] size-[13px] rounded-full border-2',
+                    job.current ? 'border-signal bg-signal' : 'border-mist bg-night',
+                  ]}
+                  aria-hidden="true"
+                />
+                <h3 class="font-display text-2xl font-semibold text-ink sm:text-3xl">{job.company}</h3>
+                <p class="mt-1 text-ink">
+                  {job.roles[0]}
+                  {job.current && <span class="ml-2 rounded-sm bg-signal/15 px-1.5 py-0.5 text-sm font-medium text-signal">Current</span>}
+                </p>
+                {job.roles.length > 1 && <p class="text-sm text-mist">Previously {job.roles.slice(1).join(', ')}</p>}
+                <p class="mt-1 text-sm text-mist">{job.place}</p>
+                <ul class="mt-4 list-disc space-y-1.5 pl-5 leading-relaxed text-mist marker:text-line">
+                  {job.summary.map((s) => <li>{s}</li>)}
+                </ul>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class={section} aria-labelledby="skills-heading">
+      <div class="grid gap-10 md:grid-cols-[14rem_1fr]">
+        <h2 id="skills-heading" class={heading}>Skills</h2>
+        <dl class="grid gap-x-12 gap-y-8 sm:grid-cols-2">
+          {skills.map(({ group, items }) => (
+            <div>
+              <dt class="font-display text-xl font-semibold text-signal">{group}</dt>
+              <dd class="mt-3 flex flex-wrap gap-2">
+                {items.map((item) => (
+                  <span class="rounded-sm border border-line px-2.5 py-1 text-sm text-ink">{item}</span>
+                ))}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+
+    <section id="projects" class="border-y border-line/60 bg-apron/40" aria-labelledby="projects-heading">
+      <div class={section}>
+        <div class="grid gap-10 md:grid-cols-[14rem_1fr]">
+          <div>
+            <h2 id="projects-heading" class={heading}>Projects</h2>
+            <p class="mt-3 text-mist">
+              More on <a href="https://github.com/Shahin1991" class="text-ink underline decoration-line underline-offset-4 hover:decoration-signal">GitHub</a>.
+            </p>
+          </div>
+          <ul class="divide-y divide-line border-y border-line">
+            {projects.map((project) => (
+              <li class="grid gap-3 py-8 md:grid-cols-[1fr_auto] md:gap-8">
+                <div class="max-w-[38rem]">
+                  <h3 class="font-display text-2xl font-semibold text-ink">{project.name}</h3>
+                  <p class="mt-2 leading-relaxed text-mist">{project.summary}</p>
+                  <p class="mt-3 text-sm text-mist">
+                    <span class="sr-only">Built with </span>{project.stack.join(', ')}
+                  </p>
+                </div>
+                <div class="flex gap-5 md:flex-col md:items-end md:gap-2">
+                  {project.demo && (
+                    <a href={project.demo} class="inline-flex items-center gap-1.5 font-medium text-signal hover:underline">
+                      Live demo <Icon name="external" class="size-4" />
+                      <span class="sr-only">of {project.name}</span>
+                    </a>
+                  )}
+                  <a href={project.repo} class="inline-flex items-center gap-1.5 font-medium text-ink hover:text-signal">
+                    Source <Icon name="github" class="size-4" />
+                    <span class="sr-only">of {project.name}</span>
+                  </a>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class={section} aria-labelledby="contact-heading">
+      <div class="grid gap-10 md:grid-cols-[14rem_1fr]">
+        <h2 id="contact-heading" class={heading}>Contact</h2>
+        <div>
+          <p class="text-lg text-mist">Email is the quickest way to reach me.</p>
+          <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <a
+              href={`mailto:${profile.email}`}
+              class="font-display text-[clamp(1.6rem,6vw,3rem)] font-semibold break-all text-ink underline decoration-signal decoration-2 underline-offset-8 hover:text-signal"
+            >
+              {profile.email}
+            </a>
+            <button
+              type="button"
+              class="inline-flex items-center gap-1.5 rounded border border-line px-3 py-2 text-sm text-mist hover:border-mist hover:text-ink"
+              data-copy={profile.email}
+            >
+              <Icon name="copy" class="size-4" />
+              <span data-copy-label>Copy email</span>
+            </button>
+            <span class="sr-only" role="status" data-copy-status></span>
+          </div>
+
+          <ul class="mt-10 flex flex-wrap gap-x-8 gap-y-3">
+            {socials.map(({ label, href, icon }) => (
+              <li>
+                <a href={href} class="inline-flex items-center gap-2 text-mist hover:text-signal" rel="me noopener">
+                  <Icon name={icon} />
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-line/60">
+    <div class="mx-auto flex max-w-6xl flex-wrap justify-between gap-2 px-4 py-8 text-sm text-mist sm:px-6">
+      <p>&copy; {year} {profile.name}</p>
+      <p>{profile.location}</p>
+    </div>
+  </footer>
+</Layout>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-copy]');
+  const label = document.querySelector<HTMLElement>('[data-copy-label]');
+  const status = document.querySelector<HTMLElement>('[data-copy-status]');
+
+  button?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(button.dataset.copy ?? '');
+      label!.textContent = 'Copied';
+      status!.textContent = 'Email address copied';
+      setTimeout(() => {
+        label!.textContent = 'Copy email';
+        status!.textContent = '';
+      }, 2000);
+    } catch {
+      label!.textContent = 'Select and copy the address';
+    }
+  });
+</script>

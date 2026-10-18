@@ -1,0 +1,51 @@
+---
+// Renders text as a split-flap departure board. The final text is in the HTML, so the board reads
+// correctly with JavaScript off; the flip animation only runs when motion is allowed.
+interface Props {
+  text: string;
+  as?: 'h1' | 'p';
+  class?: string;
+  delay?: number;
+}
+const { text, as: Tag = 'p', class: className = '', delay = 0 } = Astro.props;
+const words = text.toUpperCase().split(' ');
+---
+
+<Tag class:list={['flex flex-wrap gap-x-[0.45em] gap-y-[0.18em]', className]} data-board data-delay={delay}>
+  <span class="sr-only">{text}</span>
+  {words.map((word) => (
+    <span class="inline-flex gap-[0.06em]" aria-hidden="true">
+      {[...word].map((char) => <span class="flap" data-char={char}>{char}</span>)}
+    </span>
+  ))}
+</Tag>
+
+<script>
+  const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reduced) {
+    document.querySelectorAll<HTMLElement>('[data-board]').forEach((board) => {
+      const start = Number(board.dataset.delay ?? 0);
+      board.querySelectorAll<HTMLElement>('.flap').forEach((flap, i) => {
+        const target = flap.dataset.char ?? '';
+        const flips = 6 + Math.floor(Math.random() * 6);
+        let count = 0;
+        flap.dataset.flipping = '';
+        flap.textContent = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+        setTimeout(() => {
+          const timer = setInterval(() => {
+            count += 1;
+            if (count >= flips) {
+              clearInterval(timer);
+              flap.textContent = target;
+              delete flap.dataset.flipping;
+              return;
+            }
+            flap.textContent = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+          }, 55);
+        }, start + i * 35);
+      });
+    });
+  }
+</script>

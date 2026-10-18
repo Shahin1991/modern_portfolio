@@ -1,0 +1,56 @@
+---
+import '../styles/global.css';
+import portrait from '../assets/portrait.jpeg';
+import { profile } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title = `${profile.name}, ${profile.role}`, description = profile.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(portrait.src, Astro.site);
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.name,
+  jobTitle: profile.role,
+  worksFor: { '@type': 'Organization', name: 'Emirates' },
+  address: { '@type': 'PostalAddress', addressLocality: 'Dubai', addressCountry: 'AE' },
+  email: `mailto:${profile.email}`,
+  url: profile.url,
+  sameAs: ['https://ae.linkedin.com/in/shahin-nazer-mohiuddin-62b59b33', 'https://github.com/Shahin1991', 'https://twitter.com/shahin91'],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#172031" />
+    <meta name="generator" content={Astro.generator} />
+
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@shahin91" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+  </head>
+  <body class="min-h-dvh bg-night text-ink antialiased">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:bg-signal focus:px-4 focus:py-2 focus:font-semibold focus:text-night">
+      Skip to content
+    </a>
+    <slot />
+  </body>
+</html>

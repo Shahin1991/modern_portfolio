@@ -1,0 +1,67 @@
+---
+const links = [
+  { href: '#about', label: 'About' },
+  { href: '#experience', label: 'Experience' },
+  { href: '#skills', label: 'Skills' },
+  { href: '#projects', label: 'Projects' },
+  { href: '#contact', label: 'Contact' },
+];
+---
+
+<header class="sticky top-0 z-40 border-b border-line/60 bg-night/90 backdrop-blur">
+  <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6" aria-label="Main">
+    <a href="#top" class="font-display text-xl font-semibold tracking-wide text-ink hover:text-signal">
+      Shahin Nazer
+    </a>
+
+    <button
+      type="button"
+      class="-mr-2 grid size-11 place-items-center rounded text-ink md:hidden"
+      aria-expanded="false"
+      aria-controls="nav-links"
+      data-menu-button
+    >
+      <span class="sr-only">Menu</span>
+      <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M4 7h16M4 12h16M4 17h16" data-icon-open />
+        <path d="M6 6l12 12M18 6 6 18" data-icon-close hidden />
+      </svg>
+    </button>
+
+    <ul
+      id="nav-links"
+      class="absolute inset-x-0 top-16 hidden flex-col border-b border-line bg-night px-4 pb-4 md:static md:flex md:flex-row md:gap-8 md:border-0 md:bg-transparent md:p-0"
+      data-menu
+    >
+      {links.map(({ href, label }) => (
+        <li>
+          <a href={href} class="block py-3 text-mist hover:text-ink md:py-0">{label}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-menu-button]')!;
+  const menu = document.querySelector<HTMLElement>('[data-menu]')!;
+
+  const setOpen = (open: boolean) => {
+    button.setAttribute('aria-expanded', String(open));
+    menu.classList.toggle('hidden', !open);
+    menu.classList.toggle('flex', open);
+    button.querySelector('[data-icon-open]')!.toggleAttribute('hidden', open);
+    button.querySelector('[data-icon-close]')!.toggleAttribute('hidden', !open);
+  };
+
+  button.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'));
+  menu.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) setOpen(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+      setOpen(false);
+      button.focus();
+    }
+  });
+</script>
